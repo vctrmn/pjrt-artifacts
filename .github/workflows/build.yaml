@@ -131,19 +131,19 @@ jobs:
 
       - name: "Build ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         run: |
-          platform="${{ matrix.pjrt.platform }}"
-          arch="${platform#*-}"
+          arch="${{ matrix.pjrt.platform#*- }}"
           bazelisk \
             run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball_${arch}
 
       - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         run: |
+          arch="${{ matrix.pjrt.platform#*- }}"
           docker run \
             --name=pjrt-${{ matrix.pjrt.target }} \
             -w=/xla \
             --net=host \
             -v=/tmp/cache:/tmp/cache \
-            distroless/${{ matrix.pjrt.target }}_builder:latest \
+            distroless/${{ matrix.pjrt.target }}_builder:{arch}-latest \
               bazelisk \
               build \
               --remote_cache=grpc://127.0.0.1:15501 \
