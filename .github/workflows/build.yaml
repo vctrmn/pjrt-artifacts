@@ -105,7 +105,7 @@ jobs:
             artifact: libpjrt_c_api_cpu_plugin.so
             renamed_artifact: libpjrt_cpu.so
             runs_on: ["ubuntu-24.04"]
-            platform: linux-arm64
+            platform: linux-amd64
             bazel_target: //xla/pjrt/c:pjrt_c_api_cpu_plugin
     runs-on: ${{ matrix.pjrt.runs_on }}
     steps:
@@ -124,8 +124,10 @@ jobs:
 
       - name: "Build ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         run: |
+          platform="${{ matrix.pjrt.platform }}"
+          arch="${platform#*-}"
           bazelisk \
-            run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball
+            run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball_${arch}
 
 #      - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
 #        run: |

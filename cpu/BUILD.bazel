@@ -1,11 +1,13 @@
-load("@aspect_bazel_lib//lib:tar.bzl", "tar", "tar_rule")
-load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+"""
+This file defines Bazel targets for constructing and managing an OCI (Open Container Initiative) image named cpu_stripped.
+"""
+
+load("@aspect_bazel_lib//lib:tar.bzl", "tar")
 load("@rules_distroless//distroless:defs.bzl", "flatten")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load")
 load("//utils/bazel/dedup_tar:defs.bzl", "dedupe_tar")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
+# Create a tarball with symbolic links
 tar(
     name = "symlinks",
     mtree = [
@@ -24,8 +26,8 @@ tar(
     ],
 )
 
-
-cpu_PACKAGES = [
+# List of Ubuntu packages to include in the image
+CPU_PACKAGES = [
     "@cpu_ubuntu//autoconf",
     "@cpu_ubuntu//automake",
     "@cpu_ubuntu//build-essential",
@@ -39,23 +41,44 @@ cpu_PACKAGES = [
     "@cpu_ubuntu//zlib1g-dev",
 ]
 
+# Combine all specified tarballs into one
 flatten(
-    name = "cpu_packages",
+    name = "cpu_packages_amd64",
     tars = [
         "%s/amd64" % package
-        for package in cpu_PACKAGES
+        for package in CPU_PACKAGES
     ],
 )
 
+flatten(
+    name = "cpu_packages_arm64",
+    tars = [
+        "%s/arm64" % package
+        for package in CPU_PACKAGES
+    ],
+)
+
+# Deduplicate files in the combined tarball to reduce its size
 dedupe_tar(
-    name = "strip_packages",
-    src = ":cpu_packages",
+    name = "strip_packages_amd64",
+    src = ":cpu_packages_amd64",
     strip_directory = 0,
 )
 
+dedupe_tar(
+    name = "strip_packages_arm64",
+    src = ":cpu_packages_arm64",
+    strip_directory = 0,
+)
+
+# Define an OCI-compliant image
 oci_image(
-    name = "cpu_stripped",
+    name = "cpu_stripped_amd64",
     architecture = "amd64",
+    env = {
+        "MAX_NUM_WORKERS": -1,
+        "TERM": "xterm",
+    },
     os = "linux",
     tars = [
         "//base/jammy:bazelisk",
@@ -63,20 +86,45 @@ oci_image(
         "//base/jammy:passwd",
         "//base/jammy:group",
         "//base/jammy:packages",
-        ":strip_packages",
+        ":strip_packages_amd64",
         ":symlinks",
         "//third_party/openxla:openxla_layer_cpu",
     ],
+)
+
+oci_image(
+    name = "cpu_stripped_arm64",
+    architecture = "arm64",
     env = {
         "MAX_NUM_WORKERS": -1,
         "TERM": "xterm",
     },
+    os = "linux",
+    tars = [
+        "//base/jammy:bazelisk",
+        "//base/jammy:cacerts",
+        "//base/jammy:passwd",
+        "//base/jammy:group",
+        "//base/jammy:packages",
+        ":strip_packages_arm64",
+        ":symlinks",
+        "//third_party/openxla:openxla_layer_cpu",
+    ],
+)
+
+# Export the OCI image as a tarball
+oci_load(
+    name = "cpu_stripped_tarball_amd64",
+    image = ":cpu_stripped_amd64",
+    repo_tags = [
+        "distroless/cpu_builder:amd64-latest",
+    ],
 )
 
 oci_load(
-    name = "cpu_stripped_tarball",
-    image = ":cpu_stripped",
+    name = "cpu_stripped_tarball_arm64",
+    image = ":cpu_stripped_arm64",
     repo_tags = [
-        "distroless/cpu_builder:latest",
+        "distroless/cpu_builder:arm64-latest",
     ],
 )

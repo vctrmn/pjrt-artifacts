@@ -16,6 +16,7 @@ sources:
     
 archs:
   - "amd64"
+  - "arm64"
 
 packages:
 - "autoconf"
@@ -29,6 +30,3 @@ packages:
 - "clang-format-18"
 - "wget"
 - "zlib1g-dev"
-
-    
-  
