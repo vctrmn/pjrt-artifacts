@@ -124,7 +124,8 @@ jobs:
 
       - name: "Build ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         run: |
-          ~/bin/bazel run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball
+          bazelisk \
+            run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball
 
       - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         run: |
