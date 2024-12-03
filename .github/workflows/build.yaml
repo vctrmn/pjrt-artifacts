@@ -101,6 +101,7 @@ jobs:
           #            platform: linux-amd64
           #            bazel_target: //xla/pjrt/c:pjrt_c_api_cpu_plugin
           - target: cpu
+            if: false # This disables the job
             config: ""
             artifact: libpjrt_c_api_cpu_plugin.so
             renamed_artifact: libpjrt_cpu.so
@@ -187,7 +188,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            pjrt-cpu_linux-amd64.tar.gz/pjrt-cpu_linux-amd64.tar.gz
             pjrt-cpu_linux-arm64.tar.gz/pjrt-cpu_linux-arm64.tar.gz
 
 #            pjrt-cpu_linux-riscv.tar.gz/pjrt-cpu_linux-riscv.tar.gz
