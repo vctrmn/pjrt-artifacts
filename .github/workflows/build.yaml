@@ -107,7 +107,7 @@ jobs:
 
       - name: Force remove container
         run: |
-          docker rm -f pjrt-${{ matrix.pjrt.target }}
+          docker rm -f pjrt-${{ matrix.pjrt.target }} || true
 
       - name: "Build ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         run: |
@@ -124,7 +124,6 @@ jobs:
             distroless/${{ matrix.pjrt.target }}_builder:latest \
               bazelisk \
               build \
-              --remote_cache=grpc://127.0.0.1:15501 \
               --disk_cache=/tmp/cache \
               ${{ matrix.pjrt.config }} --repo_env=HERMETIC_PYTHON_VERSION=3.11 \
               ${{ matrix.pjrt.bazel_target }}
