@@ -105,14 +105,14 @@ jobs:
             config: ""
             artifact: libpjrt_c_api_cpu_plugin.so
             renamed_artifact: libpjrt_cpu.so
-            runs_on: ["ubuntu-24.04"]
+            runs_on: ["buildjet-4vcpu-ubuntu-2204"]
             platform: linux-amd64
             bazel_target: //xla/pjrt/c:pjrt_c_api_cpu_plugin
           - target: cpu
             config: ""
             artifact: libpjrt_c_api_cpu_plugin.so
             renamed_artifact: libpjrt_cpu.so
-            runs_on: ["macos-15"]
+            runs_on: ["buildjet-4vcpu-ubuntu-2204-arm"]
             platform: linux-arm64
             bazel_target: //xla/pjrt/c:pjrt_c_api_cpu_plugin
     runs-on: ${{ matrix.pjrt.runs_on }}
