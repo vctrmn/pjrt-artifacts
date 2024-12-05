@@ -27,7 +27,7 @@ packages:
   - "apt"
   - "bash"
   - "ca-certificates"
-  - "coreutils" 
+  - "coreutils"
   - "dpkg"
   - "gawk"
   - "libncurses6"
@@ -51,5 +51,3 @@ packages:
   - "libexpat1"
   - "libexpat1-dev"
   - "libomp-dev"
-    
-  

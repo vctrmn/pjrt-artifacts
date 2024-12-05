@@ -671,11 +671,11 @@
         "recordedFileInputs": {
           "@@aspect_bazel_lib~~toolchains~yq_darwin_amd64//yq": "f75bfb3a827d42b797c3a3895c0ea0019219f7a025edcf2f1fd487c2475ed948",
           "@@//base/focal/packages.yaml": "7e4eccc80bd77e65ebc44e1dda77195da786a769fb45aad6dcaaa4447e79e2b6",
-          "@@//base/jammy/packages.yaml": "01a41259186bb2e4f2336f522e6cc1c02061841be9260bbadbd08430f9653763",
+          "@@//base/jammy/packages.yaml": "fb90ae8de3bb4df1df63b7440a7fb790a863ca4b6df8543e023469d250a477ce",
           "@@//rocm/rocm_ubuntu.yaml": "7f010889fec825240e9f0eaeee2d9fbadffd8ff9553a7f0ca24122110b304c27",
           "@@//base/noble/packages.yaml": "ac2ba6c647eae20eb7ff6bc709d5f7b6389a2b95cca178e801f0f4a7d13c5f1f",
           "@@//cuda/cuda_ubuntu.yaml": "035c295cd8d73d19ef8f49699414c7adcf0fb874c2e7b20b295bea64c78b6788",
-          "@@//cpu/cpu_ubuntu.yaml": "b6fdebf29265ab929394ba730f1832e26ad2c9b5f6b6fef2080fed2085e75c84"
+          "@@//cpu/cpu_ubuntu.yaml": "b765cb1b5d09016101361523405ece3e1b35b627a42c821a619627a71a79e2dc"
         },
         "recordedDirentsInputs": {},
         "envVariables": {},

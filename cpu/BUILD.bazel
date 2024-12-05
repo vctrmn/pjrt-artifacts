@@ -1,5 +1,5 @@
 """
-This file defines Bazel targets for constructing and managing an OCI (Open Container Initiative) image named cpu_stripped.
+This file defines Bazel targets for constructing and managing an OCI image named cpu_stripped.
 """
 
 load("@aspect_bazel_lib//lib:tar.bzl", "tar")
