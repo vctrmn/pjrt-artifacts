@@ -1,11 +1,6 @@
-load("@aspect_bazel_lib//lib:tar.bzl", "tar")
+load("@rules_distroless//distroless:defs.bzl", "cacerts", "flatten", "group", "passwd")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("@container_structure_test//:defs.bzl", "container_structure_test")
-load("@rules_distroless//apt:defs.bzl", "dpkg_status")
-load("@rules_distroless//distroless:defs.bzl", "group", "passwd", "flatten", "cacerts")
-load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load")
 load("//utils/bazel/dedup_tar:defs.bzl", "dedupe_tar")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 passwd(
     name = "passwd",
@@ -29,8 +24,14 @@ passwd(
 )
 
 cacerts(
-    name = "cacerts",
+    name = "cacerts_amd64",
     package = "@jammy_ubuntu//ca-certificates/amd64:data",
+    visibility = ["//visibility:public"],
+)
+
+cacerts(
+    name = "cacerts_arm64",
+    package = "@jammy_ubuntu//ca-certificates/arm64:data",
     visibility = ["//visibility:public"],
 )
 
@@ -49,13 +50,12 @@ group(
     visibility = ["//visibility:public"],
 )
 
-
 pkg_tar(
     name = "bazelisk",
-    package_dir = "/usr/bin",
     srcs = [
         "@bazelisk//file",
     ],
+    package_dir = "/usr/bin",
     visibility = ["//visibility:public"],
 )
 
@@ -64,7 +64,7 @@ PACKAGES = [
     "@jammy_ubuntu//apt",
     "@jammy_ubuntu//bash",
     "@jammy_ubuntu//ca-certificates",
-    "@jammy_ubuntu//coreutils" ,
+    "@jammy_ubuntu//coreutils",
     "@jammy_ubuntu//dpkg",
     "@jammy_ubuntu//gawk",
     "@jammy_ubuntu//libncurses6",
@@ -90,15 +90,29 @@ PACKAGES = [
 ]
 
 flatten(
-    name = "flatten_packages",
-    tars =  [
+    name = "flatten_packages_amd64",
+    tars = [
         "%s/amd64" % package
         for package in PACKAGES
     ],
 )
 
+flatten(
+    name = "flatten_packages_arm64",
+    tars = [
+        "%s/arm64" % package
+        for package in PACKAGES
+    ],
+)
+
 dedupe_tar(
-    name = "packages",
-    src = ":flatten_packages",
+    name = "packages_amd64",
+    src = ":flatten_packages_amd64",
+    visibility = ["//visibility:public"],
+)
+
+dedupe_tar(
+    name = "packages_arm64",
+    src = ":flatten_packages_arm64",
     visibility = ["//visibility:public"],
 )
