@@ -31,7 +31,7 @@ cacerts(
 
 cacerts(
     name = "cacerts_arm64",
-    package = "@jammy_ubuntu//ca-certificates/aarch64:data",
+    package = "@jammy_ubuntu//ca-certificates/arm64:data",
     visibility = ["//visibility:public"],
 )
 
