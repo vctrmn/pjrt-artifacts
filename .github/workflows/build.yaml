@@ -131,7 +131,7 @@ jobs:
             echo "Unsupported architecture: $ARCH" >&2
             exit 1
           fi
-          wget https://github.com/bazelbuild/bazelisk/releases/download/v1.24.1/bazelisk-linux-$ARCH -O ~/bin/bazel
+          wget https://github.com/bazelbuild/bazelisk/releases/download/v1.24.1/bazelisk-linux-${ARCH} -O ~/bin/bazel
           chmod +x ~/bin/bazel
 
       - name: Force remove container
