@@ -105,6 +105,22 @@ jobs:
           wget https://github.com/bazelbuild/bazelisk/releases/download/v1.20.0/bazelisk-linux-amd64 -O ~/bin/bazel
           chmod +x ~/bin/bazel
 
+      - name: Download and Setup bzlcache
+        run: |
+          wget https://github.com/jbdalido/bazel-remote/releases/download/test/bazel-remote -O /usr/local/bin/bzlcache
+          chmod +x /usr/local/bin/bzlcache
+          echo "Run bazel cache"
+          sudo systemd-run --property=Restart=always /usr/local/bin/bzlcache \
+            --max_size=1000 \
+            --grpc_address 127.0.0.1:15501 \
+            --dir=/tmp/cache \
+            --s3.region eu-west-3 \
+            --s3.bucket runs-on-s3bucketcache-jycgicewbssh \
+            --s3.auth_method iam_role \
+            --s3.prefix cache \
+            --s3.endpoint=s3.eu-west-3.amazonaws.com \
+            --storage_mode uncompressed
+
       - name: Force remove container
         run: |
           docker rm -f pjrt-${{ matrix.pjrt.target }} || true
