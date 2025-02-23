@@ -54,7 +54,12 @@ jobs:
           path: ./xla
 
   pjrt-artifacts:
-    runs-on: ${{ matrix.pjrt.runs_on }}
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:22.04
+      volumes:
+        - /usr/local/share/cache:/root/.cache
+
     strategy:
       fail-fast: false
       matrix:
@@ -63,16 +68,12 @@ jobs:
             config: "--config=cuda"
             artifact: libpjrt_c_api_gpu_plugin.so
             renamed_artifact: libpjrt_cuda_pascal.so
-            runs_on:
-              ["runs-on", "runner=32cpu-linux-x64", "image=ubuntu22-amd64"]
             platform: linux-amd64
             bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
           - target: cuda_lovelace
             config: "--config=cuda"
             artifact: libpjrt_c_api_gpu_plugin.so
             renamed_artifact: libpjrt_cuda_lovelace.so
-            runs_on:
-              ["runs-on", "runner=32cpu-linux-x64", "image=ubuntu22-amd64"]
             platform: linux-amd64
             bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
           # - target: cuda
@@ -116,6 +117,17 @@ jobs:
 
     needs: ["setup_openxla"]
     steps:
+      - name: Install prerequisites
+        run: |
+          apt-get update
+          apt-get install -y ca-certificates curl gnupg git wget
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          chmod a+r /etc/apt/keyrings/docker.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update
+          apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
       - name: "Checking out repository"
         uses: actions/checkout@v4
         with:
