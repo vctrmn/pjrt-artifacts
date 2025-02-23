@@ -66,12 +66,20 @@ jobs:
           #   renamed_artifact: libpjrt_cuda_pascal.so
           #   platform: linux-amd64
           #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
-          - target: cuda_lovelace
+          # - target: cuda_lovelace
+          #   config: "--config=cuda"
+          #   artifact: libpjrt_c_api_gpu_plugin.so
+          #   renamed_artifact: libpjrt_cuda_lovelace.so
+          #   platform: linux-amd64
+          #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
+
+          - target: cuda
             config: "--config=cuda"
             artifact: libpjrt_c_api_gpu_plugin.so
-            renamed_artifact: libpjrt_cuda_lovelace.so
+            renamed_artifact: libpjrt_cuda.so
             platform: linux-amd64
             bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
+
           # - target: cuda
           #   config: "--config=cuda"
           #   artifact: libpjrt_c_api_gpu_plugin.so
