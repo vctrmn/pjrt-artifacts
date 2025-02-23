@@ -75,22 +75,8 @@ jobs:
             platform: linux-amd64
             bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
 
-          # - target: cuda
-          #   config: "--config=cuda"
-          #   artifact: libpjrt_c_api_gpu_plugin.so
-          #   renamed_artifact: libpjrt_cuda.so
-          #   platform: linux-amd64
-          #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
-
-          # - target: cuda
-          #   config: "--config=cuda"
-          #   artifact: libpjrt_c_api_gpu_plugin.so
-          #   renamed_artifact: libpjrt_cuda.so
-          #   runs_on:
-          #     ["runs-on", "runner=32cpu-linux-x64", "image=ubuntu22-amd64"]
-          #   platform: linux-amd64
-          #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
           # - target: rocm
+          #   renamed_target: rocm
           #   config: "--config=rocm"
           #   artifact: libpjrt_c_api_gpu_plugin.so
           #   renamed_artifact: libpjrt_rocm.so
@@ -99,6 +85,7 @@ jobs:
           #   platform: linux-amd64
           #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
           # - target: cpu
+          #   renamed_target: cpu
           #   config: "--config=release_macos_arm64"
           #   artifact: bazel-bin/xla/pjrt/c/libpjrt_c_api_cpu_plugin.dylib
           #   runs_on: ["self-hosted", "macOS"]
@@ -106,6 +93,7 @@ jobs:
           #   platform: darwin-arm64
           #   bazel_target: //xla/pjrt/c:pjrt_c_api_cpu_plugin
           # - target: cpu
+          #   renamed_target: cpu
           #   config: "--config=release_macos_base"
           #   artifact: bazel-bin/xla/pjrt/c/libpjrt_c_api_cpu_plugin.dylib
           #   renamed_artifact: libpjrt_cpu.dylib
@@ -113,6 +101,7 @@ jobs:
           #   platform: darwin-amd64
           #   bazel_target: //xla/pjrt/c:pjrt_c_api_cpu_plugin
           # - target: cpu
+          #   renamed_target: cpu
           #   config: "--remote_cache=grpc://127.0.0.1:15501"
           #   artifact: bazel-bin/xla/pjrt/c/libpjrt_c_api_cpu_plugin.so
           #   renamed_artifact: libpjrt_cpu.so
