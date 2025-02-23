@@ -117,6 +117,18 @@ jobs:
 
     needs: ["setup_openxla"]
     steps:
+      - name: Setup non-root user
+        run: |
+          # Create non-root user
+          useradd -m builder
+          # Give sudo access without password
+          apt-get update && apt-get install -y sudo
+          echo "builder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/builder
+          # Create necessary directories and set ownership
+          mkdir -p /root/.cache
+          chown -R builder:builder /root/.cache
+          chown -R builder:builder /github/home
+
       - name: Install prerequisites
         run: |
           apt-get update
@@ -154,13 +166,13 @@ jobs:
         if: matrix.pjrt.target != 'cpu'
         working-directory: ./pjrt-artifacts
         run: |
-          docker rm -f pjrt-${{ matrix.pjrt.target }}
+          su - builder -c "docker rm -f pjrt-${{ matrix.pjrt.target }}
           ~/bin/bazel run //cuda:cuda_stripped_tarball
 
       - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         if: matrix.pjrt.target != 'cpu'
         run: |
-          docker run \
+          su - builder -c "docker run \
             --name=pjrt-${{ matrix.pjrt.target }} \
             -w=/xla \
             --net=host \
@@ -178,7 +190,7 @@ jobs:
               --remote_header=x-buildbuddy-api-key=${{ secrets.BUILDBUDDY_ORG_API_KEY }} \
               --disk_cache=/tmp/cache \
               ${{ matrix.pjrt.config }} \
-              ${{ matrix.pjrt.bazel_target }}
+              ${{ matrix.pjrt.bazel_target }}"
 
       - name: "Retrieve ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} artifacts"
         if: matrix.pjrt.target != 'cpu'
