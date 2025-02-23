@@ -60,25 +60,27 @@ jobs:
       fail-fast: false
       matrix:
         pjrt:
-          # - target: cuda_pascal
-          #   config: "--config=cuda"
-          #   artifact: libpjrt_c_api_gpu_plugin.so
-          #   renamed_artifact: libpjrt_cuda_pascal.so
-          #   platform: linux-amd64
-          #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
-          # - target: cuda_lovelace
-          #   config: "--config=cuda"
-          #   artifact: libpjrt_c_api_gpu_plugin.so
-          #   renamed_artifact: libpjrt_cuda_lovelace.so
-          #   platform: linux-amd64
-          #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
-
           - target: cuda
+            renamed_target: cuda_pascal
             config: "--config=cuda"
             artifact: libpjrt_c_api_gpu_plugin.so
-            renamed_artifact: libpjrt_cuda.so
+            renamed_artifact: libpjrt_cuda_pascal.so
             platform: linux-amd64
             bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
+          - target: cuda
+            renamed_target: cuda_lovelace
+            config: "--config=cuda"
+            artifact: libpjrt_c_api_gpu_plugin.so
+            renamed_artifact: libpjrt_cuda_lovelace.so
+            platform: linux-amd64
+            bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
+
+          # - target: cuda
+          #   config: "--config=cuda"
+          #   artifact: libpjrt_c_api_gpu_plugin.so
+          #   renamed_artifact: libpjrt_cuda.so
+          #   platform: linux-amd64
+          #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
 
           # - target: cuda
           #   config: "--config=cuda"
@@ -141,18 +143,14 @@ jobs:
       - name: "Setup bazelrc for openxla"
         run: |
           cp pjrt-artifacts/openxla/bazelrc/common.bazelrc xla/
-          cp pjrt-artifacts/openxla/bazelrc/${{ matrix.pjrt.target }}.bazelrc xla/xla_configure.bazelrc
+          cp pjrt-artifacts/openxla/bazelrc/${{ matrix.pjrt.renamed_target }}.bazelrc xla/xla_configure.bazelrc
 
       - name: "Build ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         if: matrix.pjrt.target != 'cpu'
         working-directory: ./pjrt-artifacts
         run: |
           docker rm -f pjrt-${{ matrix.pjrt.target }}
-          if [[ "${{ matrix.pjrt.target }}" == cuda* ]]; then
-            ~/bin/bazel run //cuda:cuda_stripped_tarball
-          else
-            ~/bin/bazel run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball
-          fi
+          ~/bin/bazel run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball
 
       - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         if: matrix.pjrt.target != 'cpu'
@@ -214,13 +212,13 @@ jobs:
           cwd: ./
           files: |
             ./${{ matrix.pjrt.renamed_artifact }}
-          outPath: pjrt-${{ matrix.pjrt.target }}_${{ matrix.pjrt.platform }}.tar.gz
+          outPath: pjrt-${{ matrix.pjrt.renamed_target }}_${{ matrix.pjrt.platform }}.tar.gz
 
-      - name: Upload ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} artifacts
+      - name: Upload ${{ matrix.pjrt.renamed_target }} ${{ matrix.pjrt.platform }} artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pjrt-${{ matrix.pjrt.target }}_${{ matrix.pjrt.platform }}.tar.gz
-          path: pjrt-${{ matrix.pjrt.target }}_${{ matrix.pjrt.platform }}.tar.gz
+          name: pjrt-${{ matrix.pjrt.renamed_target }}_${{ matrix.pjrt.platform }}.tar.gz
+          path: pjrt-${{ matrix.pjrt.renamed_target }}_${{ matrix.pjrt.platform }}.tar.gz
 
   release:
     needs: ["pjrt-artifacts"]
