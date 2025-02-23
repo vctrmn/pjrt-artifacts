@@ -124,6 +124,11 @@ jobs:
           # Give sudo access without password
           apt-get update && apt-get install -y sudo
           echo "builder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/builder
+          # Add builder to docker group
+          groupadd -f docker
+          usermod -aG docker builder
+          # Set ownership of docker socket
+          chown root:docker /var/run/docker.sock
           # Create necessary directories and set ownership
           mkdir -p /root/.cache
           chown -R builder:builder /root/.cache
