@@ -1,8 +1,8 @@
 name: nightly - PJRT CUDA library
 on:
   pull_request:
-  schedule:
-    - cron: "0 */4 * * *"
+#  schedule:
+#    - cron: "0 */4 * * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
