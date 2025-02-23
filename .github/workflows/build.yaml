@@ -124,11 +124,6 @@ jobs:
           # Give sudo access without password
           apt-get update && apt-get install -y sudo
           echo "builder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/builder
-          # Add builder to docker group
-          groupadd -f docker
-          usermod -aG docker builder
-          # Set ownership of docker socket
-          chown root:docker /var/run/docker.sock
           # Create necessary directories and set ownership
           mkdir -p /root/.cache
           chown -R builder:builder /root/.cache
@@ -171,13 +166,13 @@ jobs:
         if: matrix.pjrt.target != 'cpu'
         working-directory: ./pjrt-artifacts
         run: |
-          su - builder -c "sudo docker rm -f pjrt-${{ matrix.pjrt.target }}"
-          ~/bin/bazel run //cuda:cuda_stripped_tarball
+          docker rm -f pjrt-${{ matrix.pjrt.target }}
+          su - builder -c "~/bin/bazel run //cuda:cuda_stripped_tarball"
 
       - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         if: matrix.pjrt.target != 'cpu'
         run: |
-          su - builder -c "sudo docker run \
+          docker run \
             --name=pjrt-${{ matrix.pjrt.target }} \
             -w=/xla \
             --net=host \
@@ -195,7 +190,7 @@ jobs:
               --remote_header=x-buildbuddy-api-key=${{ secrets.BUILDBUDDY_ORG_API_KEY }} \
               --disk_cache=/tmp/cache \
               ${{ matrix.pjrt.config }} \
-              ${{ matrix.pjrt.bazel_target }}"
+              ${{ matrix.pjrt.bazel_target }}
 
       - name: "Retrieve ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} artifacts"
         if: matrix.pjrt.target != 'cpu'
