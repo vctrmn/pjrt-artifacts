@@ -166,8 +166,9 @@ jobs:
         if: matrix.pjrt.target != 'cpu'
         working-directory: ./pjrt-artifacts
         run: |
-          docker rm -f pjrt-${{ matrix.pjrt.target }}
-          su - builder -c "~/bin/bazel run //cuda:cuda_stripped_tarball"
+          docker rm -f pjrt-${{ matrix.pjrt.target }} || true
+          chown -R builder:builder ./
+          su - builder -c "cd $(pwd) && /home/builder/bin/bazel run //cuda:cuda_stripped_tarball"
 
       - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         if: matrix.pjrt.target != 'cpu'
