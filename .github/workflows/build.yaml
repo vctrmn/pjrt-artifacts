@@ -55,21 +55,17 @@ jobs:
 
   pjrt-artifacts:
     runs-on: ubuntu-latest
-    container:
-      image: ubuntu:22.04
-      volumes:
-        - /usr/local/share/cache:/root/.cache
 
     strategy:
       fail-fast: false
       matrix:
         pjrt:
-          - target: cuda_pascal
-            config: "--config=cuda"
-            artifact: libpjrt_c_api_gpu_plugin.so
-            renamed_artifact: libpjrt_cuda_pascal.so
-            platform: linux-amd64
-            bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
+          # - target: cuda_pascal
+          #   config: "--config=cuda"
+          #   artifact: libpjrt_c_api_gpu_plugin.so
+          #   renamed_artifact: libpjrt_cuda_pascal.so
+          #   platform: linux-amd64
+          #   bazel_target: //xla/pjrt/c:pjrt_c_api_gpu_plugin
           - target: cuda_lovelace
             config: "--config=cuda"
             artifact: libpjrt_c_api_gpu_plugin.so
@@ -117,29 +113,6 @@ jobs:
 
     needs: ["setup_openxla"]
     steps:
-      - name: Setup non-root user
-        run: |
-          # Create non-root user
-          useradd -m builder
-          # Give sudo access without password
-          apt-get update && apt-get install -y sudo
-          echo "builder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/builder
-          # Create necessary directories and set ownership
-          mkdir -p /root/.cache
-          chown -R builder:builder /root/.cache
-          chown -R builder:builder /github/home
-
-      - name: Install prerequisites
-        run: |
-          apt-get update
-          apt-get install -y ca-certificates curl gnupg git wget build-essential gcc g++
-          install -m 0755 -d /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-          chmod a+r /etc/apt/keyrings/docker.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-          apt-get update
-          apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
       - name: "Checking out repository"
         uses: actions/checkout@v4
         with:
@@ -166,9 +139,8 @@ jobs:
         if: matrix.pjrt.target != 'cpu'
         working-directory: ./pjrt-artifacts
         run: |
-          docker rm -f pjrt-${{ matrix.pjrt.target }} || true
-          chown -R builder:builder ./
-          su - builder -c "cd $(pwd) && /home/builder/bin/bazel run //cuda:cuda_stripped_tarball"
+          docker rm -f pjrt-${{ matrix.pjrt.target }}
+          ~/bin/bazel run //${{ matrix.pjrt.target }}:${{ matrix.pjrt.target }}_stripped_tarball
 
       - name: "Run ${{ matrix.pjrt.target }} ${{ matrix.pjrt.platform }} image"
         if: matrix.pjrt.target != 'cpu'
